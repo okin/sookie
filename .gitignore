@@ -1,0 +1,6 @@
+# Python stuff...
+*.py[co]
+__pycache__/*
+
+# SQLite
+test.db
