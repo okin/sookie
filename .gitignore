@@ -1,3 +1,6 @@
+# vim & other editor-stuff...
+*.swp
+
 # Python stuff...
 *.py[co]
 __pycache__/*
