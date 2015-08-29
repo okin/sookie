@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, url_for 
+from flask import Flask, url_for, render_template, redirect
 from flask.ext.sqlalchemy import SQLAlchemy
+from wtforms import Form, BooleanField, TextField, PasswordField, validators, SelectField
 
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
@@ -12,19 +13,19 @@ db = SQLAlchemy(app)
 class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
-    origin = db.Column(db.String(120), unique=True)
+    source = db.Column(db.String(120), unique=True)
 
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship('Category',
         backref=db.backref('recipe', lazy='dynamic'))
 
-    def __init__(self, name, origin, category):
+    def __init__(self, name, source, category):
         self.name = name
-        self.origin = origin
+        self.source = source
         self.category = category
 
     def __repr__(self):
-        return '<Recipe({}, {})>'.format(self.name, self.origin)
+        return '<Recipe({}, {})>'.format(self.name, self.source)
 
 
 class Category(db.Model):
@@ -38,9 +39,15 @@ class Category(db.Model):
         return '<Category %r>' % self.name
 
 
+class RecipeForm(Form):
+    name = TextField('Name', [validators.Required(), validators.Length(min=4, max=80)])
+    source = TextField('Source', [validators.Required(), validators.Length(min=6, max=35)])
+    category = SelectField('Category')
+
+
 @app.route('/recipe/<int:id>')
 def showRecipe(id):
-    return '{r.name}: {r.origin}'.format(r=Recipe.query.get(id))
+    return '{r.name}: {r.source}'.format(r=Recipe.query.get(id))
 
 
 @app.route('/')
@@ -49,7 +56,7 @@ def listRecipes():
     for recipe in Recipe.query.all():
         overview.append('<li><a href="{url}">{name}</a></li>'.format(name=recipe.name, url=url_for('showRecipe', id=recipe.id)))
 
-    return ''.join(overview) 
+    return ''.join(overview)
 
 @app.route('/categories')
 def listCategories():
@@ -65,8 +72,17 @@ def showCategory(id):
     for recipe in Recipe.query.filter_by(category_id=id).all():
         overview.append('<li><a href="{url}">{name}</a></li>'.format(name=recipe.name, url=url_for('showRecipe', id=recipe.id)))
 
-    return ''.join(overview) 
-    
+    return ''.join(overview)
+
+
+@app.route('/recipe/new', methods=('GET', 'POST'))
+def submitRecipe():
+    form = RecipeForm()
+    form.category.choices = (('a', '1'),)
+    form.process()
+    if form.validate():
+        return redirect('/')
+    return render_template('new_recipe.html', form=form)
 
 if __name__ == "__main__":
     db.create_all()
@@ -74,7 +90,7 @@ if __name__ == "__main__":
     breakfast = Category('Frühstück')
     lunch = Category('Mittagessen')
     dinner = Category('Abendessen')
-    
+
     try:
         db.session.add(breakfast)
         db.session.add(lunch)

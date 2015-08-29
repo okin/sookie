@@ -1,0 +1,5 @@
+<form method="POST" action="/recipe/new">
+    {{ form.name.label }} {{ form.name(size=50) }}
+    {{ form.source.label }} {{ form.source() }}
+    <input type="submit" value="Go">
+</form>
