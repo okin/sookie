@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, url_for, render_template, redirect
+from flask import Flask, url_for, render_template, redirect, request
 from flask.ext.sqlalchemy import SQLAlchemy
-from wtforms import Form, BooleanField, TextField, PasswordField, validators, SelectField
-
+from flask.ext.wtf import Form
+from wtforms import BooleanField, TextField, PasswordField, validators
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -39,10 +40,14 @@ class Category(db.Model):
         return '<Category %r>' % self.name
 
 
+def enabled_categories():
+    return Category.query.all()
+
+
 class RecipeForm(Form):
     name = TextField('Name', [validators.Required(), validators.Length(min=4, max=80)])
     source = TextField('Source', [validators.Required(), validators.Length(min=6, max=35)])
-    category = SelectField('Category')
+    category = QuerySelectField(query_factory=enabled_categories)
 
 
 @app.route('/recipe/<int:id>')
@@ -77,12 +82,16 @@ def showCategory(id):
 
 @app.route('/recipe/new', methods=('GET', 'POST'))
 def submitRecipe():
-    form = RecipeForm()
-    form.category.choices = (('a', '1'),)
-    form.process()
-    if form.validate():
+    form = RecipeForm(request.form, csrf_enabled=False)
+
+    if form.validate_on_submit():
+        rec = Recipe(form.name.data, form.source.data, form.category.data)
+        db.session.add(rec)
+        db.session.commit()
+
         return redirect('/')
-    return render_template('new_recipe.html', form=form)
+
+    return render_template('new_recipe.html', form=form, errors=form.errors)
 
 if __name__ == "__main__":
     db.create_all()

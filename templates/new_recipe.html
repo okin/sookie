@@ -1,5 +1,9 @@
+{{ errors }}
+
 <form method="POST" action="/recipe/new">
+    {{ form.hidden_tag() }}
     {{ form.name.label }} {{ form.name(size=50) }}
     {{ form.source.label }} {{ form.source() }}
+    {{ form.category.label }} {{ form.category() }}
     <input type="submit" value="Go">
 </form>
