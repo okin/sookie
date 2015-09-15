@@ -60,11 +60,8 @@ def showRecipe(id):
 
 @app.route('/')
 def listRecipes():
-    overview = []
-    for recipe in Recipe.query.all():
-        overview.append('<li><a href="{url}">{name}</a></li>'.format(name=recipe.name, url=url_for('showRecipe', id=recipe.id)))
+    return render_template('start.html', categories=Category.query.all())
 
-    return ''.join(overview)
 
 @app.route('/categories')
 @app.route('/category/')
