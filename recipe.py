@@ -3,7 +3,7 @@
 from flask import Flask, url_for, render_template, redirect, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.wtf import Form
-from wtforms import BooleanField, TextField, PasswordField, validators
+from wtforms import TextField, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
