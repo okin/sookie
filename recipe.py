@@ -67,6 +67,7 @@ def listRecipes():
     return ''.join(overview)
 
 @app.route('/categories')
+@app.route('/category/')
 def listCategories():
     cats = []
     for cat in Category.query.all():
