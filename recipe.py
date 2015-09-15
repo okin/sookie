@@ -77,11 +77,8 @@ def listCategories():
 
 @app.route('/category/<int:id>')
 def showCategory(id):
-    overview = []
-    for recipe in Recipe.query.filter_by(category_id=id).all():
-        overview.append('<li><a href="{url}">{name}</a></li>'.format(name=recipe.name, url=url_for('showRecipe', id=recipe.id)))
-
-    return ''.join(overview)
+    category = Category.query.filter_by(id=id).one()
+    return render_template('category_overview.html', category=category, recipes=Recipe.query.filter_by(category_id=id).all())
 
 
 @app.route('/recipe/new', methods=('GET', 'POST'))

@@ -1,0 +1,8 @@
+
+<h1>{{ category.name }}</h1>
+
+<ul>
+{% for recipe in recipes %}
+    <li>{{ recipe.name }} <em>({{ recipe.source }})</em></li>
+{% endfor %}
+</ul>
