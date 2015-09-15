@@ -1,8 +1,14 @@
 
 <h1>{{ category.name }}</h1>
 
+{% if recipes %}
 <ul>
 {% for recipe in recipes %}
     <li>{{ recipe.name }} <em>({{ recipe.source }})</em></li>
 {% endfor %}
 </ul>
+{% else %}
+No recipes :(
+
+<br><a href="/recipe/new">Add</a> a recipe!
+{% endif %}
