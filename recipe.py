@@ -79,7 +79,8 @@ def showCategory(id):
     category = Category.query.filter_by(id=id).one()
     return render_template('category_overview.html',
                            category=category,
-                           recipes=Recipe.query.filter_by(category_id=id).all())
+                           recipes=sorted(Recipe.query.filter_by(category_id=id).all(),
+                                          key=lambda r: r.name.lower()))
 
 
 @app.route('/recipe/new', methods=('GET', 'POST'))
