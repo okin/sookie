@@ -43,14 +43,10 @@ class Category(db.Model):
         return '<Category %r>' % self.name
 
 
-def enabled_categories():
-    return Category.query.all()
-
-
 class RecipeForm(Form):
     name = TextField('Name', [validators.Required(), validators.Length(min=4, max=80)])
     source = TextField('Source', [validators.Required(), validators.Length(min=6, max=35)])
-    category = QuerySelectField(query_factory=enabled_categories)
+    category = QuerySelectField(query_factory=lambda: Category.query.all())
 
 
 @app.route('/recipe/<int:id>')
