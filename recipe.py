@@ -51,7 +51,9 @@ class RecipeForm(Form):
 
 @app.route('/recipe/<int:id>')
 def showRecipe(id):
-    return '{r.name}: {r.source}'.format(r=Recipe.query.get(id))
+    recipe = Recipe.query.get(id)
+    cat = recipe.category
+    return render_template('recipe.html', recipe=recipe, category_link=url_for('showCategory', id=cat.id), category=cat.name)
 
 
 @app.route('/')
