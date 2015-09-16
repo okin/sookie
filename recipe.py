@@ -5,6 +5,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.wtf import Form
 from wtforms import TextField, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
+
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -18,7 +19,8 @@ class Recipe(db.Model):
 
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship('Category',
-        backref=db.backref('recipe', lazy='dynamic'))
+                               backref=db.backref('recipe',
+                                                  lazy='dynamic'))
 
     def __init__(self, name, source, category):
         self.name = name
@@ -44,8 +46,10 @@ class Category(db.Model):
 
 
 class RecipeForm(Form):
-    name = TextField('Name', [validators.Required(), validators.Length(min=4, max=80)])
-    source = TextField('Source', [validators.Required(), validators.Length(min=6, max=35)])
+    name = TextField('Name', [validators.Required(),
+                              validators.Length(min=4, max=80)])
+    source = TextField('Source', [validators.Required(),
+                                  validators.Length(min=6, max=35)])
     category = QuerySelectField(query_factory=lambda: Category.query.all())
 
 
@@ -53,7 +57,10 @@ class RecipeForm(Form):
 def showRecipe(id):
     recipe = Recipe.query.get(id)
     cat = recipe.category
-    return render_template('recipe.html', recipe=recipe, category_link=url_for('showCategory', id=cat.id), category=cat.name)
+    return render_template('recipe.html',
+                           recipe=recipe,
+                           category_link=url_for('showCategory', id=cat.id),
+                           category=cat.name)
 
 
 @app.route('/')
@@ -66,10 +73,13 @@ def listRecipes():
 def listCategories():
     return render_template('categories.html', categories=Category.query.all())
 
+
 @app.route('/category/<int:id>')
 def showCategory(id):
     category = Category.query.filter_by(id=id).one()
-    return render_template('category_overview.html', category=category, recipes=Recipe.query.filter_by(category_id=id).all())
+    return render_template('category_overview.html',
+                           category=category,
+                           recipes=Recipe.query.filter_by(category_id=id).all())
 
 
 @app.route('/recipe/new', methods=('GET', 'POST'))
