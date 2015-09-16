@@ -81,7 +81,7 @@ def submitRecipe():
         db.session.add(rec)
         db.session.commit()
 
-        return redirect('/')
+        return redirect(url_for('showRecipe', id=rec.id))
 
     return render_template('new_recipe.html', form=form, errors=form.errors)
 
