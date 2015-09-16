@@ -66,11 +66,7 @@ def listRecipes():
 @app.route('/categories')
 @app.route('/category/')
 def listCategories():
-    cats = []
-    for cat in Category.query.all():
-        cats.append('<li><a href="{url}">{name}</a></li>'.format(name=cat.name, url=url_for('showCategory', id=cat.id)))
-
-    return ''.join(cats)
+    return render_template('categories.html', categories=Category.query.all())
 
 @app.route('/category/<int:id>')
 def showCategory(id):

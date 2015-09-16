@@ -1,0 +1,6 @@
+<h1>Categories</h1>
+<ul>
+{% for category in categories %}
+    <li><a href="{{ category.id }}">{{ category.name }}</a></li>
+{% endfor %}
+</ul>
