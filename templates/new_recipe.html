@@ -1,5 +1,10 @@
 {% if errors %}
-{{ errors }}
+{% for error, messages in errors.items() %}
+<strong>{{ error }}:</strong>
+{% for message in messages %}
+{{ message }}
+{% endfor %}
+{% endfor %}
 {% endif %}
 
 <form method="POST" action="/recipe/new">
