@@ -55,7 +55,7 @@ class RecipeForm(Form):
 
 @app.route('/recipe/<int:id>')
 def showRecipe(id):
-    recipe = Recipe.query.get(id)
+    recipe = Recipe.query.get_or_404(id)
     cat = recipe.category
     return render_template('recipe.html',
                            recipe=recipe,
@@ -76,7 +76,7 @@ def listCategories():
 
 @app.route('/category/<int:id>')
 def showCategory(id):
-    category = Category.query.filter_by(id=id).one()
+    category = Category.query.filter_by(id=id).first_or_404()
     return render_template('category_overview.html',
                            category=category,
                            recipes=sorted(Recipe.query.filter_by(category_id=id).all(),
