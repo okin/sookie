@@ -96,6 +96,12 @@ def submitRecipe():
 
     return render_template('new_recipe.html', form=form, errors=form.errors)
 
+
+@app.errorhandler(404)
+def errorOccured(error):
+    return render_template('404.html', error=error), 404
+
+
 if __name__ == "__main__":
     db.create_all()
 
