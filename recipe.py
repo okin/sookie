@@ -117,7 +117,7 @@ if __name__ == "__main__":
         db.session.add(Recipe('Foobrot', 'VFF, S.124', lunch))
         db.session.add(Recipe('Banane', 'VFF, S.125', breakfast))
         db.session.commit()
-    except Exception as e:
-        print(e)
+    except Exception as error:
+        print("Failed to load example data: {}".format(error))
 
     app.run(debug=True)
