@@ -3,7 +3,7 @@
 {% if recipes %}
 <ul>
 {% for recipe in recipes %}
-    <li>{{ recipe.name }} <em>({{ recipe.source }})</em></li>
+    <li><a href="{{ urls[recipe.id] }}">{{ recipe.name }}</a></li>
 {% endfor %}
 </ul>
 {% else %}
