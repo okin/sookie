@@ -82,7 +82,7 @@ def list_categories():
 def show_category(id):
     category = Category.query.filter_by(id=id).first_or_404()
     recipes = sorted(Recipe.query.filter_by(category_id=id).all(),
-                     key=lambda recipe: recipe.name.lower()),
+                     key=lambda recipe: recipe.name.lower())
     return render_template('category_overview.html',
                            category=category,
                            recipes=recipes,
