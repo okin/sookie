@@ -11,6 +11,10 @@ Verwendung mit einem virtualenv und virtualenvwrapper.
 
 ## Ausführen
 
-Wiederum im virtualenv (workon sookie)
+Das Virtualenv aktivieren:
+
+  $ workon sookie
+
+Und dann den Server starten:
 
   $ python sookie.py

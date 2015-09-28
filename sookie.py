@@ -6,9 +6,13 @@ from flask.ext.wtf import Form
 from wtforms import TextField, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
+try:
+    from config import SQLALCHEMY_DATABASE_URI
+except ImportError:
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
+
 app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
 
 
