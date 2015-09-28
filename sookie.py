@@ -85,8 +85,6 @@ def show_category(id):
                            category=category,
                            recipes=sorted(Recipe.query.filter_by(category_id=id).all(),
                                           key=lambda r: r.name.lower()),
-                           urls=dict(
-                            (recipe.id, url_for('show_recipe', id=recipe.id)) for recipe in Recipe.query.all())
                            )
 
 
