@@ -58,7 +58,7 @@ class RecipeForm(Form):
 
 
 @app.route('/recipe/<int:id>')
-def showRecipe(id):
+def show_recipe(id):
     recipe = Recipe.query.get_or_404(id)
     cat = recipe.category
     return render_template('recipe.html',
@@ -68,18 +68,18 @@ def showRecipe(id):
 
 
 @app.route('/')
-def listRecipes():
+def list_recipes():
     return render_template('start.html', categories=Category.query.all())
 
 
 @app.route('/categories')
 @app.route('/category/')
-def listCategories():
+def list_categories():
     return render_template('categories.html', categories=Category.query.all())
 
 
 @app.route('/category/<int:id>')
-def showCategory(id):
+def show_category(id):
     category = Category.query.filter_by(id=id).first_or_404()
     return render_template('category_overview.html',
                            category=category,
@@ -88,7 +88,7 @@ def showCategory(id):
 
 
 @app.route('/recipe/new', methods=('GET', 'POST'))
-def submitRecipe():
+def submit_recipe():
     form = RecipeForm(request.form, csrf_enabled=False)
 
     if form.validate_on_submit():
@@ -102,7 +102,7 @@ def submitRecipe():
 
 
 @app.errorhandler(404)
-def errorOccured(error):
+def error_occured(error):
     return render_template('404.html', error=error), 404
 
 
