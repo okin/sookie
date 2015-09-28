@@ -63,7 +63,7 @@ def show_recipe(id):
     cat = recipe.category
     return render_template('recipe.html',
                            recipe=recipe,
-                           category_link=url_for('showCategory', id=cat.id),
+                           category_link=url_for('show_category', id=cat.id),
                            category=cat.name)
 
 
@@ -96,7 +96,7 @@ def submit_recipe():
         db.session.add(rec)
         db.session.commit()
 
-        return redirect(url_for('showRecipe', id=rec.id))
+        return redirect(url_for('show_recipe', id=rec.id))
 
     return render_template('new_recipe.html', form=form, errors=form.errors)
 
