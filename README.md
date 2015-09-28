@@ -1,16 +1,16 @@
-# recipe
+# sookie
 
 ## Installation
 
 Verwendung mit einem virtualenv und virtualenvwrapper.
 
-  $ mkvirtualenv recipe
-  $ workon recipe
+  $ mkvirtualenv sookie
+  $ workon sookie
   $ pip install -r requirements.txt
 
 
 ## Ausführen
 
-Wiederum im virtualenv (workon recipe)
+Wiederum im virtualenv (workon sookie)
 
-  $ python recipe.py
+  $ python sookie.py
