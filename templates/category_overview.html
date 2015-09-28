@@ -9,5 +9,5 @@
 {% else %}
 No recipes :(
 
-<br><a href="/recipe/new">Add</a> a recipe!
+<br><a href="{{ url_for('submit_recipe') }}">Add</a> a recipe!
 {% endif %}
