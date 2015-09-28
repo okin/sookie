@@ -11,8 +11,17 @@ try:
 except ImportError:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
 
+
+try:
+    from config import SECRET_KEY
+except ImportError:
+    print('NO SECRET KEY SET!')
+    SECRET_KEY = 'dummy - change me'
+
+# TODO: refactor config parsing. Read the appropriate part in flask docs.
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+app.config['SECRET_KEY'] = SECRET_KEY
 db = SQLAlchemy(app)
 
 
@@ -91,7 +100,7 @@ def show_category(id):
 
 @app.route('/recipe/new', methods=('GET', 'POST'))
 def submit_recipe():
-    form = RecipeForm(request.form, csrf_enabled=False)
+    form = RecipeForm(request.form)
 
     if form.validate_on_submit():
         rec = Recipe(form.name.data, form.source.data, form.category.data)
