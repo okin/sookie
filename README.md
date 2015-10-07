@@ -4,17 +4,22 @@
 
 Verwendung mit einem virtualenv und virtualenvwrapper.
 
-  $ mkvirtualenv sookie
-  $ workon sookie
-  $ pip install -r requirements.txt
-
+```
+$ mkvirtualenv sookie
+$ workon sookie
+$ pip install -r requirements.txt
+```
 
 ## Ausführen
 
 Das Virtualenv aktivieren:
 
-  $ workon sookie
+```
+$ workon sookie
+```
 
 Und dann den Server starten:
 
-  $ python sookie.py
+```
+$ python sookie.py
+```
