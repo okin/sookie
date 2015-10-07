@@ -1,7 +1,7 @@
 #! python3
 # -*- coding: utf-8 -*-
 
-# sookie is a recipe and food scheduling web application
+# sookie is a recipe and food planning web application
 # Copyright (C) 2015  Niko Wenselowski
 
 # This program is free software: you can redistribute it and/or modify
