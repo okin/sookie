@@ -55,7 +55,7 @@ class Recipe(db.Model):
                                backref=db.backref('recipe',
                                                   lazy='dynamic'))
 
-    def __init__(self, name, source, category):
+    def __init__(self, name="", source=None, category=None):
         self.name = name
         self.source = source
         self.category = category
@@ -68,7 +68,7 @@ class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
 
-    def __init__(self, name):
+    def __init__(self, name=None):
         self.name = name
 
     def __str__(self):
@@ -137,8 +137,13 @@ def error_occured(error):
     return render_template('404.html', error=error), 404
 
 
+class CategoryModelView(ModelView):
+    create_modal = True
+    edit_modal = True
+    form_excluded_columns = ['recipe']
+
 admin.add_view(ModelView(Recipe, db.session))
-admin.add_view(ModelView(Category, db.session))
+admin.add_view(CategoryModelView(Category, db.session))
 
 if __name__ == "__main__":
     db.create_all()
