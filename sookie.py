@@ -1,3 +1,4 @@
+#! python3
 # -*- coding: utf-8 -*-
 
 # sookie is a recipe and food scheduling web application
