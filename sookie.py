@@ -58,7 +58,7 @@ class Recipe(db.Model):
         self.category = category
 
     def __repr__(self):
-        return '<Recipe({}, {})>'.format(self.name, self.source)
+        return '<Recipe({!r}, {!r})>'.format(self.name, self.source)
 
 
 class Category(db.Model):
@@ -72,7 +72,7 @@ class Category(db.Model):
         return self.name
 
     def __repr__(self):
-        return '<Category %r>' % self.name
+        return '<Category({!r})>'.format(self.name)
 
 
 class RecipeForm(Form):
