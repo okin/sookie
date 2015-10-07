@@ -7,7 +7,7 @@
 {% endfor %}
 {% endif %}
 
-<form method="POST" action="/recipe/new">
+<form method="POST" action="{{ url_for('submit_recipe') }}">
     {{ form.hidden_tag() }}
     {{ form.name.label }} {{ form.name(size=50) }}
     {{ form.source.label }} {{ form.source() }}
