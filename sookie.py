@@ -17,28 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Flask, url_for, render_template, redirect, request
+from flask import Flask, g, redirect, render_template, request, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.wtf import Form
 from wtforms import TextField, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
-try:
-    from config import SQLALCHEMY_DATABASE_URI
-except ImportError:
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
-
-
-try:
-    from config import SECRET_KEY
-except ImportError:
-    print('NO SECRET KEY SET!')
-    SECRET_KEY = 'dummy - change me'
-
-# TODO: refactor config parsing. Read the appropriate part in flask docs.
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
-app.config['SECRET_KEY'] = SECRET_KEY
+app.config.from_object("config")
+app.config.from_envvar('SOOKIE_SETTINGS', silent=True)
 db = SQLAlchemy(app)
 
 
