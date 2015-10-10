@@ -70,6 +70,25 @@ class RecipeForm(Form):
     category = QuerySelectField(query_factory=lambda: Category.query.all())
 
 
+def init_db():
+    db.create_all()
+
+    breakfast = Category('Frühstück')
+    lunch = Category('Mittagessen')
+    dinner = Category('Abendessen')
+
+    try:
+        db.session.add(breakfast)
+        db.session.add(lunch)
+        db.session.add(dinner)
+        db.session.add(Recipe('Mandelfoo', 'VFF, S.123', breakfast))
+        db.session.add(Recipe('Foobrot', 'VFF, S.124', lunch))
+        db.session.add(Recipe('Banane', 'VFF, S.125', breakfast))
+        db.session.commit()
+    except Exception as error:
+        print("Failed to load example data: {}".format(error))
+
+
 @app.route('/recipe/<int:id>')
 def show_recipe(id):
     recipe = Recipe.query.get_or_404(id)
@@ -122,21 +141,6 @@ def error_occured(error):
 
 
 if __name__ == "__main__":
-    db.create_all()
-
-    breakfast = Category('Frühstück')
-    lunch = Category('Mittagessen')
-    dinner = Category('Abendessen')
-
-    try:
-        db.session.add(breakfast)
-        db.session.add(lunch)
-        db.session.add(dinner)
-        db.session.add(Recipe('Mandelfoo', 'VFF, S.123', breakfast))
-        db.session.add(Recipe('Foobrot', 'VFF, S.124', lunch))
-        db.session.add(Recipe('Banane', 'VFF, S.125', breakfast))
-        db.session.commit()
-    except Exception as error:
-        print("Failed to load example data: {}".format(error))
+    init_db()
 
     app.run(debug=True)
