@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+{% block body %}
 <h1>{{ recipe.name }}</h1>
 
 {{ recipe.source }}
@@ -5,3 +7,4 @@
 <hr>
 
 More <a href="{{ category_link }}">{{ category }}</a>
+{% endblock %}
