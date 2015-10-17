@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+{% block body %}
 <h1>Sookie</h1>
 
 <h2>Categories</h2>
@@ -9,3 +11,4 @@
 
 <h2>New recipe</h2>
 <a href="{{ url_for('submit_recipe') }}">Add</a> a recipe!
+{% endblock %}

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Flask, url_for, render_template, redirect, request
+from flask import Flask, g, redirect, render_template, request, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.wtf import Form
 from flask_admin import Admin
@@ -25,22 +25,9 @@ from flask_admin.contrib.sqla import ModelView
 from wtforms import TextField, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
-try:
-    from config import SQLALCHEMY_DATABASE_URI
-except ImportError:
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
-
-
-try:
-    from config import SECRET_KEY
-except ImportError:
-    print('NO SECRET KEY SET!')
-    SECRET_KEY = 'dummy - change me'
-
-# TODO: refactor config parsing. Read the appropriate part in flask docs.
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
-app.config['SECRET_KEY'] = SECRET_KEY
+app.config.from_object("config")
+app.config.from_envvar('SOOKIE_SETTINGS', silent=True)
 db = SQLAlchemy(app)
 admin = Admin(app, name='sookie', template_mode='bootstrap3')
 
@@ -84,6 +71,25 @@ class RecipeForm(Form):
     source = TextField('Source', [validators.Required(),
                                   validators.Length(min=6, max=35)])
     category = QuerySelectField(query_factory=lambda: Category.query.all())
+
+
+def init_db():
+    db.create_all()
+
+    breakfast = Category('Frühstück')
+    lunch = Category('Mittagessen')
+    dinner = Category('Abendessen')
+
+    try:
+        db.session.add(breakfast)
+        db.session.add(lunch)
+        db.session.add(dinner)
+        db.session.add(Recipe('Mandelfoo', 'VFF, S.123', breakfast))
+        db.session.add(Recipe('Foobrot', 'VFF, S.124', lunch))
+        db.session.add(Recipe('Banane', 'VFF, S.125', breakfast))
+        db.session.commit()
+    except Exception as error:
+        print("Failed to load example data: {}".format(error))
 
 
 @app.route('/recipe/<int:id>')
@@ -146,21 +152,6 @@ admin.add_view(ModelView(Recipe, db.session))
 admin.add_view(CategoryModelView(Category, db.session))
 
 if __name__ == "__main__":
-    db.create_all()
-
-    breakfast = Category('Frühstück')
-    lunch = Category('Mittagessen')
-    dinner = Category('Abendessen')
-
-    try:
-        db.session.add(breakfast)
-        db.session.add(lunch)
-        db.session.add(dinner)
-        db.session.add(Recipe('Mandelfoo', 'VFF, S.123', breakfast))
-        db.session.add(Recipe('Foobrot', 'VFF, S.124', lunch))
-        db.session.add(Recipe('Banane', 'VFF, S.125', breakfast))
-        db.session.commit()
-    except Exception as error:
-        print("Failed to load example data: {}".format(error))
+    init_db()
 
     app.run(debug=True)

@@ -1,3 +1,8 @@
+{% extends "base.html" %}
+{% block title %}
+<title>Sookie - {{ category.name }}</title>
+{% endblock %}
+{% block body %}
 <h1>{{ category.name }}</h1>
 
 {% if recipes %}
@@ -11,3 +16,4 @@ No recipes :(
 
 <br><a href="{{ url_for('submit_recipe') }}">Add</a> a recipe!
 {% endif %}
+{% endblock %}

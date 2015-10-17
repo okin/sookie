@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+{% block body %}
 {% if errors %}
 {% for error, messages in errors.items() %}
 <strong>{{ error }}:</strong>
@@ -14,3 +16,4 @@
     {{ form.category.label }} {{ form.category() }}
     <input type="submit" value="Go">
 </form>
+{% endblock %}
