@@ -20,6 +20,8 @@
 from flask import Flask, url_for, render_template, redirect, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.wtf import Form
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 from wtforms import TextField, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
@@ -40,6 +42,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SECRET_KEY'] = SECRET_KEY
 db = SQLAlchemy(app)
+admin = Admin(app, name='sookie', template_mode='bootstrap3')
 
 
 class Recipe(db.Model):
@@ -52,7 +55,7 @@ class Recipe(db.Model):
                                backref=db.backref('recipe',
                                                   lazy='dynamic'))
 
-    def __init__(self, name, source, category):
+    def __init__(self, name="", source=None, category=None):
         self.name = name
         self.source = source
         self.category = category
@@ -65,7 +68,7 @@ class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
 
-    def __init__(self, name):
+    def __init__(self, name=None):
         self.name = name
 
     def __str__(self):
@@ -133,6 +136,14 @@ def submit_recipe():
 def error_occured(error):
     return render_template('404.html', error=error), 404
 
+
+class CategoryModelView(ModelView):
+    create_modal = True
+    edit_modal = True
+    form_excluded_columns = ['recipe']
+
+admin.add_view(ModelView(Recipe, db.session))
+admin.add_view(CategoryModelView(Category, db.session))
 
 if __name__ == "__main__":
     db.create_all()
