@@ -32,6 +32,20 @@ db = SQLAlchemy(app)
 admin = Admin(app, name='sookie', template_mode='bootstrap3')
 
 
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+
+    def __init__(self, name=None):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return '<Category({!r})>'.format(self.name)
+
+
 class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
@@ -49,20 +63,6 @@ class Recipe(db.Model):
 
     def __repr__(self):
         return '<Recipe({!r}, {!r})>'.format(self.name, self.source)
-
-
-class Category(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-
-    def __init__(self, name=None):
-        self.name = name
-
-    def __str__(self):
-        return self.name
-
-    def __repr__(self):
-        return '<Category({!r})>'.format(self.name)
 
 
 class RecipeForm(Form):
