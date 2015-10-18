@@ -46,9 +46,18 @@ class Category(db.Model):
         return '<Category({!r})>'.format(self.name)
 
 
-class Recipe(db.Model):
+class PlannableItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
+
+    def __init__(self, name=""):
+        self.name = name
+
+    def __repr__(self):
+        return '<PlannableItem({!r})>'.format(self.name)
+
+
+class Recipe(PlannableItem):
     source = db.Column(db.String(120), unique=True)
 
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
