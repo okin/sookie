@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Days</h1>
+
+{% if days %}
+<ul>
+{% for day in days %}
+    <li><a href="{{ url_for('show_day', id=day.id) }}">{{ day.date }}</a> ({{ day.recipes|length }} Rezepte)</li>
+{% endfor %}
+</ul>
+{% else %}
+No days :(
+{% endif %}
+
+<br><a href="{{ url_for('add_day') }}">Add</a> a day!
+{% endblock %}

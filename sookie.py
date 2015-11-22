@@ -23,7 +23,8 @@ from flask.ext.wtf import Form
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from wtforms import TextField, validators
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.fields.html5 import DateField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
 app = Flask(__name__)
 app.config.from_object("config")
@@ -95,6 +96,32 @@ class RecipeForm(Form):
     category = QuerySelectField(query_factory=lambda: Category.query.all())
 
 
+day_recipe_mapping = db.Table('day_recipe_mapping', db.metadata,
+    db.Column('day_id', db.Integer, db.ForeignKey('day.id')),
+    db.Column('recipe_id', db.Integer, db.ForeignKey('recipe.id'))
+)
+
+
+class Day(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date)
+    recipes = db.relationship('Recipe', secondary=day_recipe_mapping)
+
+    def __init__(self, date, recipes=None):
+        self.date = date
+        self.recipes = recipes or []
+
+    def __repr__(self):
+        return '<Day({!r}, {!r})>'.format(self.date, self.recipes)
+
+
+class DayForm(Form):
+    date = DateField('Date', format='%d.%m.%Y',
+                             validators=[validators.required()]
+                             )
+    recipes = QuerySelectMultipleField(query_factory=lambda: Recipe.query.all())
+
+
 def init_db():
     db.create_all()
 
@@ -158,6 +185,33 @@ def submit_recipe():
         return redirect(url_for('show_recipe', id=rec.id))
 
     return render_template('new_recipe.html', form=form, errors=form.errors)
+
+
+@app.route('/day/')
+def list_days():
+    return render_template('day_overview.html', days=Day.query.all())
+
+
+@app.route('/day/<int:id>')
+def show_day(id):
+    day = Day.query.filter_by(id=id).first_or_404()
+    return render_template('day.html', day=day)
+
+
+@app.route('/day/new', methods=('GET', 'POST'))
+def add_day():
+    form = DayForm(request.form)
+
+    print(form.date)
+
+    if form.validate_on_submit():
+        day = Day(form.date.data, form.recipes.data)
+        db.session.add(day)
+        db.session.commit()
+
+        return redirect(url_for('show_day', id=day.id))
+
+    return render_template('new_day.html', form=form, errors=form.errors)
 
 
 @app.errorhandler(404)
