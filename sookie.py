@@ -54,9 +54,9 @@ class PlannableItem(db.Model):
     type = db.Column(db.String(10))
 
     __mapper_args__ = {
-        'polymorphic_on':type,
-        'polymorphic_identity':'plannableitem',
-        'with_polymorphic':'*'
+        'polymorphic_on': type,
+        'polymorphic_identity': 'plannableitem',
+        'with_polymorphic': '*'
     }
 
     def __init__(self, name=""):
@@ -64,7 +64,6 @@ class PlannableItem(db.Model):
 
     def __repr__(self):
         return '<PlannableItem({!r})>'.format(self.name)
-
 
 
 class Recipe(PlannableItem):
