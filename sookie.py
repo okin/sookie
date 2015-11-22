@@ -47,8 +47,17 @@ class Category(db.Model):
 
 
 class PlannableItem(db.Model):
+    __tablename__ = 'plannableitem'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
+    type = db.Column(db.String(10))
+
+    __mapper_args__ = {
+        'polymorphic_on':type,
+        'polymorphic_identity':'plannableitem',
+        'with_polymorphic':'*'
+    }
 
     def __init__(self, name=""):
         self.name = name
@@ -57,13 +66,18 @@ class PlannableItem(db.Model):
         return '<PlannableItem({!r})>'.format(self.name)
 
 
+
 class Recipe(PlannableItem):
+    __tablename__ = 'recipe'
+    id = db.Column(db.Integer, db.ForeignKey('plannableitem.id'), primary_key=True)
     source = db.Column(db.String(120), unique=True)
 
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship('Category',
                                backref=db.backref('recipe',
                                                   lazy='dynamic'))
+
+    __mapper_args__ = {'polymorphic_identity': 'recipe'}
 
     def __init__(self, name="", source=None, category=None):
         self.name = name
