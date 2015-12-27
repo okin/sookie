@@ -198,6 +198,21 @@ def show_day(id):
     return render_template('day.html', day=day)
 
 
+@app.route('/day/<int:id>/edit', methods=('GET', 'POST'))
+def edit_day(id):
+    day = Day.query.filter_by(id=id).first_or_404()
+    form = DayForm(request.form, day)
+
+    if form.validate_on_submit():
+        day.recipes = form.recipes.data
+        db.session.add(day)
+        db.session.commit()
+
+        return redirect(url_for('show_day', id=day.id))
+
+    return render_template('edit_day.html', day=day, form=form)
+
+
 @app.route('/day/new', methods=('GET', 'POST'))
 def add_day():
     form = DayForm(request.form)

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block body %}
+{% if errors %}
+{% for error, messages in errors.items() %}
+<strong>{{ error }}:</strong>
+{% for message in messages %}
+{{ message }}
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+<form method="POST" action="{{ url_for('edit_day', id=day.id) }}">
+    {{ form.hidden_tag() }}
+    {{ form.date.label }} {{ form.date() }}<br/>
+    {{ form.recipes.label }} {{ form.recipes() }}
+    <input type="submit" value="Go">
+</form>
+{% endblock %}

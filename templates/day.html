@@ -14,6 +14,6 @@
 {% else %}
 No recipes :(
 {% endif %}
-<br><a href="{{ url_for('add_day') }}">Add</a> a recipe!
+<br><a href="{{ url_for('edit_day', id=day.id) }}">Edit</a> day!
 
 {% endblock %}
