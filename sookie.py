@@ -237,8 +237,16 @@ class CategoryModelView(ModelView):
     edit_modal = True
     form_excluded_columns = ['recipe']
 
+
+class DayModelView(ModelView):
+    create_modal = True
+    edit_modal = True
+    form_excluded_columns = ['recipe']
+
+
 admin.add_view(ModelView(Recipe, db.session))
 admin.add_view(CategoryModelView(Category, db.session))
+admin.add_view(DayModelView(Day, db.session))
 
 if __name__ == "__main__":
     init_db()
