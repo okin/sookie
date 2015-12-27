@@ -217,8 +217,6 @@ def edit_day(id):
 def add_day():
     form = DayForm(request.form)
 
-    print(form.date)
-
     if form.validate_on_submit():
         day = Day(form.date.data, form.recipes.data)
         db.session.add(day)
