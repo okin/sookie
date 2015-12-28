@@ -17,38 +17,23 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Flask, g, redirect, render_template, request, url_for
+from datetime import timedelta
+
+import sqlalchemy.orm.exc
+from flask import Flask, redirect, render_template, request, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.wtf import Form
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from wtforms import TextField, validators
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.fields.html5 import DateField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
 app = Flask(__name__)
 app.config.from_object("config")
 app.config.from_envvar('SOOKIE_SETTINGS', silent=True)
 db = SQLAlchemy(app)
 admin = Admin(app, name='sookie', template_mode='bootstrap3')
-
-
-class Recipe(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-    source = db.Column(db.String(120), unique=True)
-
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-    category = db.relationship('Category',
-                               backref=db.backref('recipe',
-                                                  lazy='dynamic'))
-
-    def __init__(self, name="", source=None, category=None):
-        self.name = name
-        self.source = source
-        self.category = category
-
-    def __repr__(self):
-        return '<Recipe({!r}, {!r})>'.format(self.name, self.source)
 
 
 class Category(db.Model):
@@ -65,12 +50,108 @@ class Category(db.Model):
         return '<Category({!r})>'.format(self.name)
 
 
+class PlannableItem(db.Model):
+    __tablename__ = 'plannableitem'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    type = db.Column(db.String(10))
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'plannableitem',
+        'with_polymorphic': '*'
+    }
+
+    def __init__(self, name=""):
+        self.name = name
+
+    def __repr__(self):
+        return '<PlannableItem({!r})>'.format(self.name)
+
+
+class Recipe(PlannableItem):
+    __tablename__ = 'recipe'
+    id = db.Column(db.Integer, db.ForeignKey('plannableitem.id'), primary_key=True)
+    source = db.Column(db.String(120), unique=True)
+
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    category = db.relationship('Category',
+                               backref=db.backref('recipe',
+                                                  lazy='dynamic'))
+
+    __mapper_args__ = {'polymorphic_identity': 'recipe'}
+
+    def __init__(self, name="", source=None, category=None):
+        self.name = name
+        self.source = source
+        self.category = category
+
+    def __repr__(self):
+        return '<Recipe({!r}, {!r})>'.format(self.name, self.source)
+
+
 class RecipeForm(Form):
     name = TextField('Name', [validators.Required(),
                               validators.Length(min=4, max=80)])
     source = TextField('Source', [validators.Required(),
                                   validators.Length(min=6, max=35)])
     category = QuerySelectField(query_factory=lambda: Category.query.all())
+
+
+day_recipe_mapping = db.Table('day_recipe_mapping', db.metadata,
+    db.Column('day_id', db.Integer, db.ForeignKey('day.id')),
+    db.Column('recipe_id', db.Integer, db.ForeignKey('recipe.id'))
+)
+
+
+class Day(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date)
+    recipes = db.relationship('Recipe', secondary=day_recipe_mapping)
+
+    def __init__(self, date, recipes=None):
+        self.date = date
+        self.recipes = recipes or []
+
+    def __repr__(self):
+        return '<Day({!r}, {!r})>'.format(self.date, self.recipes)
+
+
+class DayForm(Form):
+    date = DateField('Date', format='%d.%m.%Y',
+                             validators=[validators.required()]
+                             )
+    recipes = QuerySelectMultipleField(query_factory=lambda: Recipe.query.all())
+
+
+class Week(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    start_date = db.Column(db.Date)
+
+    def __init__(self, start_date):
+        self.start_date = start_date
+
+    @property
+    def days(self):
+        def get_day(date):
+            try:
+                return Day.query.filter_by(date=date).one()
+            except sqlalchemy.orm.exc.NoResultFound:
+                day = Day(date)
+                db.session.add(day)
+                db.session.commit()
+                return day
+
+        return [get_day(self.start_date + timedelta(days=i)) for i in range(7)]
+
+    def __repr__(self):
+        return '<Week({!r})>'.format(self.start_date)
+
+
+class WeekForm(Form):
+    start_date = DateField('Starting date', format='%d.%m.%Y',
+                                            validators=[validators.required()])
 
 
 def init_db():
@@ -138,6 +219,71 @@ def submit_recipe():
     return render_template('new_recipe.html', form=form, errors=form.errors)
 
 
+@app.route('/day/')
+def list_days():
+    return render_template('day_overview.html', days=Day.query.all())
+
+
+@app.route('/day/<int:id>')
+def show_day(id):
+    day = Day.query.filter_by(id=id).first_or_404()
+    return render_template('day.html', day=day)
+
+
+@app.route('/day/<int:id>/edit', methods=('GET', 'POST'))
+def edit_day(id):
+    day = Day.query.filter_by(id=id).first_or_404()
+    form = DayForm(request.form, day)
+
+    if form.validate_on_submit():
+        day.recipes = form.recipes.data
+        db.session.add(day)
+        db.session.commit()
+
+        return redirect(url_for('show_day', id=day.id))
+
+    return render_template('edit_day.html', day=day, form=form)
+
+
+@app.route('/day/new', methods=('GET', 'POST'))
+def add_day():
+    form = DayForm(request.form)
+
+    if form.validate_on_submit():
+        day = Day(form.date.data, form.recipes.data)
+        db.session.add(day)
+        db.session.commit()
+
+        return redirect(url_for('show_day', id=day.id))
+
+    return render_template('new_day.html', form=form, errors=form.errors)
+
+
+@app.route('/week/')
+def list_weeks():
+    return render_template('week_overview.html', weeks=Week.query.all())
+
+
+@app.route('/week/<int:id>')
+def show_week(id):
+    week = Week.query.filter_by(id=id).first_or_404()
+    return render_template('week.html', week=week)
+
+
+@app.route('/week/new', methods=('GET', 'POST'))
+def add_week():
+    form = WeekForm(request.form)
+
+    if form.validate_on_submit():
+        week = Week(form.start_date.data)
+        db.session.add(week)
+        db.session.commit()
+
+        return redirect(url_for('show_week', id=week.id))
+
+    return render_template('new_week.html', form=form, errors=form.errors)
+
+
 @app.errorhandler(404)
 def error_occured(error):
     return render_template('404.html', error=error), 404
@@ -148,8 +294,17 @@ class CategoryModelView(ModelView):
     edit_modal = True
     form_excluded_columns = ['recipe']
 
+
+class DayModelView(ModelView):
+    create_modal = True
+    edit_modal = True
+    form_excluded_columns = ['recipe']
+
+
 admin.add_view(ModelView(Recipe, db.session))
 admin.add_view(CategoryModelView(Category, db.session))
+admin.add_view(DayModelView(Day, db.session))
+admin.add_view(ModelView(Week, db.session))
 
 if __name__ == "__main__":
     init_db()

@@ -9,11 +9,9 @@
 {% endfor %}
 {% endif %}
 
-<form method="POST" action="{{ url_for('submit_recipe') }}">
+<form method="POST" action="{{ url_for('add_week') }}">
     {{ form.hidden_tag() }}
-    {{ form.name.label }} {{ form.name(size=50) }}<br/>
-    {{ form.source.label }} {{ form.source() }}<br/>
-    {{ form.category.label }} {{ form.category() }}
+    {{ form.start_date.label }} {{ form.start_date() }}
     <input type="submit" value="Go">
 </form>
 {% endblock %}

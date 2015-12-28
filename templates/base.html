@@ -5,7 +5,9 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
   <div class=metanav>
-    <a href="{{ url_for('list_categories') }}">Categories</a>
+    <a href="{{ url_for('list_weeks') }}">Weeks</a>
+    - <a href="{{ url_for('list_days') }}">Days</a>
+    - <a href="{{ url_for('list_categories') }}">Categories</a>
     - <a href="{{ url_for('list_recipes') }}">Sookie!</a>
   </div>
   {% for message in get_flashed_messages() %}

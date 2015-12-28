@@ -9,11 +9,10 @@
 {% endfor %}
 {% endif %}
 
-<form method="POST" action="{{ url_for('submit_recipe') }}">
+<form method="POST" action="{{ url_for('edit_day', id=day.id) }}">
     {{ form.hidden_tag() }}
-    {{ form.name.label }} {{ form.name(size=50) }}<br/>
-    {{ form.source.label }} {{ form.source() }}<br/>
-    {{ form.category.label }} {{ form.category() }}
+    {{ form.date.label }} {{ form.date() }}<br/>
+    {{ form.recipes.label }} {{ form.recipes() }}
     <input type="submit" value="Go">
 </form>
 {% endblock %}
