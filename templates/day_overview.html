@@ -5,7 +5,7 @@
 {% if days %}
 <ul>
 {% for day in days %}
-    <li><a href="{{ url_for('show_day', id=day.id) }}">{{ day.date }}</a> ({{ day.recipes|length }} Rezepte)</li>
+    <li><a href="{{ url_for('show_day', id=day.id) }}">{{ day.date }}</a> ({{ day.recipes|length }} recipes)</li>
 {% endfor %}
 </ul>
 {% else %}
