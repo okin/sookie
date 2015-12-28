@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block body %}
+{% if errors %}
+{% for error, messages in errors.items() %}
+<strong>{{ error }}:</strong>
+{% for message in messages %}
+{{ message }}
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+<form method="POST" action="{{ url_for('add_week') }}">
+    {{ form.hidden_tag() }}
+    {{ form.start_date.label }} {{ form.start_date() }}
+    <input type="submit" value="Go">
+</form>
+{% endblock %}

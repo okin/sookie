@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Weeks</h1>
+
+{% if weeks %}
+<ul>
+{% for week in weeks %}
+    <li><a href="{{ url_for('show_week', id=week.id) }}">Week from {{ week.start_date }}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+No weeks :(
+{% endif %}
+
+<br><a href="{{ url_for('add_week') }}">Add</a> a week!
+{% endblock %}

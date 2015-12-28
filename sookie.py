@@ -17,6 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import timedelta
+
+import sqlalchemy.orm.exc
 from flask import Flask, redirect, render_template, request, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.wtf import Form
@@ -120,6 +123,35 @@ class DayForm(Form):
                              validators=[validators.required()]
                              )
     recipes = QuerySelectMultipleField(query_factory=lambda: Recipe.query.all())
+
+
+class Week(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    start_date = db.Column(db.Date)
+
+    def __init__(self, start_date):
+        self.start_date = start_date
+
+    @property
+    def days(self):
+        def get_day(date):
+            try:
+                return Day.query.filter_by(date=date).one()
+            except sqlalchemy.orm.exc.NoResultFound:
+                day = Day(date)
+                db.session.add(day)
+                db.session.commit()
+                return day
+
+        return [get_day(self.start_date + timedelta(days=i)) for i in range(7)]
+
+    def __repr__(self):
+        return '<Week({!r})>'.format(self.start_date)
+
+
+class WeekForm(Form):
+    start_date = DateField('Starting date', format='%d.%m.%Y',
+                                            validators=[validators.required()])
 
 
 def init_db():
@@ -227,6 +259,31 @@ def add_day():
     return render_template('new_day.html', form=form, errors=form.errors)
 
 
+@app.route('/week/')
+def list_weeks():
+    return render_template('week_overview.html', weeks=Week.query.all())
+
+
+@app.route('/week/<int:id>')
+def show_week(id):
+    week = Week.query.filter_by(id=id).first_or_404()
+    return render_template('week.html', week=week)
+
+
+@app.route('/week/new', methods=('GET', 'POST'))
+def add_week():
+    form = WeekForm(request.form)
+
+    if form.validate_on_submit():
+        week = Week(form.start_date.data)
+        db.session.add(week)
+        db.session.commit()
+
+        return redirect(url_for('show_week', id=week.id))
+
+    return render_template('new_week.html', form=form, errors=form.errors)
+
+
 @app.errorhandler(404)
 def error_occured(error):
     return render_template('404.html', error=error), 404
@@ -247,6 +304,7 @@ class DayModelView(ModelView):
 admin.add_view(ModelView(Recipe, db.session))
 admin.add_view(CategoryModelView(Category, db.session))
 admin.add_view(DayModelView(Day, db.session))
+admin.add_view(ModelView(Week, db.session))
 
 if __name__ == "__main__":
     init_db()
