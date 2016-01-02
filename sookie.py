@@ -308,5 +308,4 @@ admin.add_view(ModelView(Week, db.session))
 
 if __name__ == "__main__":
     init_db()
-
-    app.run(debug=True)
+    app.run()
