@@ -38,7 +38,7 @@ admin = Admin(app, name='sookie', template_mode='bootstrap3')
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
+    name = db.Column(db.String(50), unique=True)
 
     def __init__(self, name=None):
         self.name = name
