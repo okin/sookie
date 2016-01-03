@@ -165,12 +165,17 @@ def init_db():
         db.session.add(breakfast)
         db.session.add(lunch)
         db.session.add(dinner)
+        db.session.commit()
+    except Exception as error:
+        print("Failed to add categories: {}".format(error))
+
+    try:
         db.session.add(Recipe('Mandelfoo', 'VFF, S.123', breakfast))
         db.session.add(Recipe('Foobrot', 'VFF, S.124', lunch))
         db.session.add(Recipe('Banane', 'VFF, S.125', breakfast))
         db.session.commit()
     except Exception as error:
-        print("Failed to load example data: {}".format(error))
+        print("Failed to add example data: {}".format(error))
 
 
 @app.route('/recipe/<int:id>')
