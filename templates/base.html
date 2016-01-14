@@ -3,6 +3,13 @@
 <title>Sookie</title>
 {% endblock %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+<link rel="stylesheet" type="text/css" href="/static/css/jquery-ui.css">
+
+<script src="/static/js/jquery-1.11.3.min.js"></script>
+<script src="/static/js/jquery-ui.min.js"></script>
+<script src="/static/js/application.js"></script>
+
 <div class=page>
   <div class=metanav>
     <a href="{{ url_for('list_weeks') }}">Weeks</a>
