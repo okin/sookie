@@ -5,10 +5,29 @@
 {% block body %}
 <h1>Overview for {{ week.start_date }}</h1>
 
-<ul>
-{% for day in week.days %}
-    <li><a href="{{ url_for('show_day', id=day.id) }}">{{ day.date }}</a> ({{ day.recipes|length }} recipes)</li>
-{% endfor %}
-</ul>
+<table id="week">
+	<thead>
+		<tr>
+			<td class="numbers">Date</td>
+			{% for heading in ("Breakfast","Lunch","Dinner") %}
+				<td class="text">{{heading}}</td>
+			{% endfor %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for day in week.days %}
+			<tr>
+				<td class="numbers"><a href="{{ url_for('show_day', id=day.id) }}">{{ day.date.strftime("%a, %d.%m.") }}</a></td>
+				{% for number in (1,2,3) %}
+					<td class="text">
+						{% for recipe in day.recipes|selectattr("category")|selectattr("id","equalto",number) %}
+							<a href="{{ url_for('show_recipe', id=recipe.id) }}">{{recipe.name}}</a>
+						{% endfor %}
+					</td>
+				{% endfor %}
+			<tr>
+		{% endfor %}
+	</tr>
+</table>
 
 {% endblock %}
