@@ -119,8 +119,8 @@ class Day(db.Model):
 
 
 class DayForm(Form):
-    date = DateField('Date', format='%d.%m.%Y',
-                             validators=[validators.required()]
+    date = TextField('Date', validators=[validators.required()],
+                             id="datepicker"
                              )
     recipes = QuerySelectMultipleField(query_factory=lambda: Recipe.query.all())
 
