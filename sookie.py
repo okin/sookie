@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 import sqlalchemy.orm.exc
 from flask import Flask, redirect, render_template, request, url_for
@@ -90,6 +90,9 @@ class Recipe(PlannableItem):
     def __repr__(self):
         return '<Recipe({!r}, {!r})>'.format(self.name, self.source)
 
+    def __str__(self):
+        return '{}'.format(self.name)
+
 
 class RecipeForm(Form):
     name = TextField('Name', [validators.Required(),
@@ -122,7 +125,11 @@ class DayForm(Form):
     date = TextField('Date', validators=[validators.required()],
                              id="datepicker"
                              )
-    recipes = QuerySelectMultipleField(query_factory=lambda: Recipe.query.all())
+    recipes = QuerySelectField(query_factory=lambda: Recipe.query.all())
+
+    breakfasts = QuerySelectField(query_factory=lambda: Recipe.query.filter_by(category=Category.query.filter_by(id=1).one()))
+    lunches = QuerySelectField(query_factory=lambda: Recipe.query.filter_by(category=Category.query.filter_by(id=2).one()))
+    dinners = QuerySelectField(query_factory=lambda: Recipe.query.filter_by(category=Category.query.filter_by(id=3).one()))
 
 
 class Week(db.Model):
@@ -241,7 +248,7 @@ def edit_day(id):
     form = DayForm(request.form, day)
 
     if form.validate_on_submit():
-        day.recipes = form.recipes.data
+        day.recipes = form.breakfasts.data + form.lunches.data + form.dinners.data
         db.session.add(day)
         db.session.commit()
 
@@ -255,7 +262,7 @@ def add_day():
     form = DayForm(request.form)
 
     if form.validate_on_submit():
-        day = Day(form.date.data, form.recipes.data)
+        day = Day(datetime.strptime(form.date.data, "%d.%m.%Y"), form.breakfasts.data + form.lunches.data + form.dinners.data)
         db.session.add(day)
         db.session.commit()
 

@@ -1,19 +1,35 @@
 {% extends "base.html" %}
 {% block title %}
-<title>Sookie - {{ day.date }}</title>
+<title>Sookie - {{ day.date.strftime("%A, %d.%m.") }}</title>
 {% endblock %}
 {% block body %}
-<h1>{{ day.date }}</h1>
+<h1>{{ day.date.strftime("%A, %d.%m.") }}</h1>
 
 {% if day.recipes %}
-<ul>
-{% for recipe in day.recipes %}
-    <li><a href="{{ url_for('show_recipe', id=recipe.id) }}">{{ recipe.name }}</a></li>
-{% endfor %}
-</ul>
+	<table id="day">
+		<thead>
+			<tr>
+				{% for heading in ("Breakfast","Lunch","Dinner") %}
+					<td class="text">{{heading}}</td>
+				{% endfor %}
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				{% for number in (1,2,3) %}
+					<td class="text">
+						{% for recipe in day.recipes|selectattr("category")|selectattr("id","equalto",number) %}
+							<a href="{{ url_for('show_recipe', id=recipe.id) }}">{{recipe.name}}</a>
+						{% endfor %}
+					</td>
+				{% endfor %}
+			<tr>
+	</table>
 {% else %}
-No recipes :(
+	No recipes :(
 {% endif %}
+
+
 <br><a href="{{ url_for('edit_day', id=day.id) }}">Edit</a> day!
 
 {% endblock %}
