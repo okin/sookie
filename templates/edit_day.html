@@ -12,7 +12,9 @@
 <form method="POST" action="{{ url_for('edit_day', id=day.id) }}">
     {{ form.hidden_tag() }}
     {{ form.date.label }} {{ form.date() }}<br/>
-    {{ form.recipes.label }} {{ form.recipes() }}
+    {{ form.breakfasts.label }} {{ form.breakfasts() }}<br/>
+    {{ form.lunches.label }} {{ form.lunches() }}<br/>
+    {{ form.dinners.label }} {{ form.dinners() }}
     <input type="submit" value="Go">
 </form>
 {% endblock %}
