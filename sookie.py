@@ -248,7 +248,7 @@ def edit_day(id):
     form = DayForm(request.form, day)
 
     if form.validate_on_submit():
-        day.recipes = form.breakfasts.data + form.lunches.data + form.dinners.data
+        day.recipes = [form.breakfasts.data, form.lunches.data, form.dinners.data]
         db.session.add(day)
         db.session.commit()
 
