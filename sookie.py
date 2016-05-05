@@ -157,7 +157,7 @@ class Week(db.Model):
 
 
 class WeekForm(Form):
-    start_date = DateField('Starting date', format='%d.%m.%Y',
+    start_date = DateField('Starting date', format='%Y-%m-%d',
                                             validators=[validators.required()])
 
 
